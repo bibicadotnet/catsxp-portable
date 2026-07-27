@@ -1,4 +1,4 @@
-name: Auto Build Catsxp
+name: Auto Build Catsxp Portable
 
 on:
   schedule:
@@ -51,7 +51,7 @@ jobs:
               Remove-Item -Path $installerPath -Recurse -Force
           }
           
-          $zipFile = "Catsxp_Portable_v$($version)_x64.zip"
+          $zipFile = "v$($version)_x64.zip"
           Compress-Archive -Path "$staging\*" -DestinationPath $zipFile
           
           echo "ZIP_FILE=$zipFile" >> $env:GITHUB_ENV
