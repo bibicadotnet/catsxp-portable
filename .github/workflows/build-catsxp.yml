@@ -1,0 +1,98 @@
+name: Auto Build Catsxp Portable
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Chạy định kỳ mỗi 1 giờ (phút 0 của mỗi giờ)
+  workflow_dispatch: # Tạo nút "Run workflow" để bạn có thể bấm chạy thử thủ công
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    permissions:
+      contents: write # Cấp quyền ghi để Action có thể tạo Release mới
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Catsxp via Winget
+        run: winget install -e --id Catsxp.Catsxp --accept-package-agreements --accept-source-agreements
+        
+      - name: Prepare Portable Files
+        id: prepare
+        shell: pwsh
+        run: |
+          # Xác định đường dẫn sau khi cài đặt
+          $appData = $env:LOCALAPPDATA
+          $basePath = "$appData\CatsxpSoftware\Catsxp-Browser\Application"
+          
+          if (-not (Test-Path $basePath)) {
+              Write-Error "Không tìm thấy thư mục cài đặt Catsxp: $basePath"
+              exit 1
+          }
+          
+          # Tìm thư mục chứa phiên bản (định dạng x.x.x.x)
+          $versionDir = Get-ChildItem -Path $basePath -Directory | Where-Object { $_.Name -match "^\d+\.\d+\.\d+\.\d+$" } | Select-Object -First 1
+          
+          if (-not $versionDir) {
+              Write-Error "Không tìm thấy thư mục phiên bản."
+              exit 1
+          }
+          
+          $version = $versionDir.Name
+          Write-Output "Phiên bản Catsxp đang xử lý: $version"
+          
+          # Lưu tên phiên bản vào biến môi trường để dùng cho bước sau
+          echo "VERSION=$version" >> $env:GITHUB_ENV
+          
+          # Tạo thư mục Staging để đóng gói
+          $staging = "$pwd\Catsxp_Portable"
+          New-Item -ItemType Directory -Path $staging | Out-Null
+          
+          # 1. Giữ lại file catsxp.exe
+          Copy-Item -Path "$basePath\catsxp.exe" -Destination $staging
+          
+          # 2. Giữ lại toàn bộ thư mục phiên bản
+          Copy-Item -Path $versionDir.FullName -Destination "$staging\$version" -Recurse
+          
+          # 3. Xóa thư mục Installer bên trong thư mục phiên bản
+          $installerPath = "$staging\$version\Installer"
+          if (Test-Path $installerPath) {
+              Remove-Item -Path $installerPath -Recurse -Force
+              Write-Output "Đã xóa thư mục Installer."
+          }
+          
+          # 4. Nén thành file ZIP
+          $zipFile = "Catsxp_Portable_v$($version)_x64.zip"
+          Compress-Archive -Path "$staging\*" -DestinationPath $zipFile
+          
+          # Lưu tên file ZIP vào biến môi trường
+          echo "ZIP_FILE=$zipFile" >> $env:GITHUB_ENV
+
+      - name: Check if Release Exists
+        id: check_release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Kiểm tra xem phiên bản này đã được Release trước đó chưa để tránh lỗi ghi đè mỗi giờ
+          if gh release view "${{ env.VERSION }}" > /dev/null 2>&1; then
+            echo "Release ${{ env.VERSION }} đã tồn tại. Bỏ qua tạo mới."
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "Chưa có Release ${{ env.VERSION }}. Tiến hành tạo..."
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create GitHub Release
+        if: steps.check_release.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.VERSION }}
+          name: "Catsxp Portable v${{ env.VERSION }}"
+          files: ${{ env.ZIP_FILE }}
+          body: |
+            **Bản rút gọn tự động Catsxp Portable**
+            - 📦 **Phiên bản:** ${{ env.VERSION }}
+            - 🗑️ Đã làm sạch thư mục `Installer`
+            - 🕒 Cập nhật tự động qua GitHub Actions
