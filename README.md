@@ -2,7 +2,7 @@
 
 - Download file setup tại [đây](https://github.com/bibicadotnet/catsxp-portable/releases/download/setup/Catsxp_Portable.zip)
 
-Setting Shields:
+### Setting Shields:
 
 ![zC8hTnNM](https://img.bibica.net/zC8hTnNM.png)
 
