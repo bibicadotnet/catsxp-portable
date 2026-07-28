@@ -8,7 +8,8 @@ Setting Shields:
 
 Content Filters:
 
+Bật `Developer mode` và thêm danh sách bộ lọc tùy chỉnh
+
 ```
 https://filters.bibica.net/brave-adblock.txt
 ```
-Bật `Developer mode`
