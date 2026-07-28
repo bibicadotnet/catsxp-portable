@@ -7,14 +7,18 @@
 
 ### Setting Shields:
 
+- Tùy chỉnh như hình
+
 ![zC8hTnNM](https://img.bibica.net/zC8hTnNM.png)
 
-Content Filters:
+#### Content Filters:
 
-Bật `Developer mode` và thêm vào 3 bộ lọc bên dưới
+- Bật `Developer mode` và thêm vào 3 bộ lọc bên dưới
 
 ```
 https://filters.bibica.net/brave-adblock.txt
 https://filters.bibica.net/blocklists-minimal-ublock.txt
 https://raw.githubusercontent.com/abpvn/abpvn/master/filter/abpvn_ublock.txt
 ```
+
+![fOsHKiOn](https://img.bibica.net/fOsHKiOn.png)
