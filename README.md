@@ -1,21 +1,43 @@
-[Catsxp](https://www.catsxp.com/) mặc định đã có bản di động, có điều cơ chế cập nhập của họ hơi phiền, nên làm thành 1 file bat giúp cập nhập phiên bản di động đơn giản hơn
+# Catsxp Portable
 
-- Download file setup tại [đây](https://github.com/bibicadotnet/catsxp-portable/releases/download/setup/Catsxp_Portable.zip)
-- Giải nén, chạy `update.bat`
+[Catsxp](https://www.catsxp.com/?utm_source=chatgpt.com) mặc định đã hỗ trợ chế độ Portable. Tuy nhiên, cơ chế cập nhật của phiên bản này chưa thuận tiện, nên mình viết thêm `update.bat` để việc cập nhật trở nên đơn giản hơn.
 
-![5eA1G0Ag](https://img.bibica.net/5eA1G0Ag.png)
+## Cài đặt
 
-### Setting Shields:
+* Tải gói cài đặt tại: [https://github.com/bibicadotnet/catsxp-portable/releases/download/setup/Catsxp_Portable.zip](https://github.com/bibicadotnet/catsxp-portable/releases/download/setup/Catsxp_Portable.zip)
+* Giải nén và chạy `update.bat`.
 
-- Tùy chỉnh như hình
+Sau khi hoàn tất, thư mục sẽ có cấu trúc như sau:
+
+```text
+Catsxp_Portable
+├── Cache/                               # Cache và tệp tạm
+├── Data/                                # Dữ liệu và cài đặt người dùng
+└── Catsxp/
+    ├── 151.6.7.5/                       # Tệp chương trình của phiên bản này
+    ├── catsxp.exe                       # Tệp thực thi chính
+    ├── chrome++.ini                     # Tệp cấu hình Chrome++ Next Mini
+    ├── register-default-browser.bat     # Tệp đặt trình duyệt mặc định
+    ├── update.bat                       # Tệp cập nhật lên phiên bản mới nhất
+    └── version.dll                      # Thư viện vá của Chrome++ Next Mini
+```
+
+Mọi thứ đã được cấu hình sẵn. Chỉ cần chạy `catsxp.exe` để sử dụng như một trình duyệt thông thường.
+
+Toàn bộ dữ liệu người dùng (cài đặt, hồ sơ, tiện ích mở rộng...) đều được lưu trong thư mục `Catsxp_Portable`, vì vậy bạn có thể sao chép toàn bộ thư mục sang thiết bị khác mà vẫn giữ nguyên dữ liệu.
+
+## Cấu hình Shields
+
+* Thiết lập như hình dưới đây.
 
 ![zC8hTnNM](https://img.bibica.net/zC8hTnNM.png)
 
-#### Content Filters:
+### Content Filters
 
-- Bật `Developer mode` và thêm vào 3 bộ lọc bên dưới
+* Bật **Developer mode**.
+* Thêm 3 bộ lọc sau:
 
-```
+```text
 https://filters.bibica.net/brave-adblock.txt
 https://filters.bibica.net/blocklists-minimal-ublock.txt
 https://raw.githubusercontent.com/abpvn/abpvn/master/filter/abpvn_ublock.txt
