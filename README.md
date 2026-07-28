@@ -11,8 +11,10 @@
 
 Content Filters:
 
-Bật `Developer mode` và thêm danh sách bộ lọc tùy chỉnh
+Bật `Developer mode` và thêm vào 3 bộ lọc bên dưới
 
 ```
 https://filters.bibica.net/brave-adblock.txt
+https://filters.bibica.net/blocklists-minimal-ublock.txt
+https://raw.githubusercontent.com/abpvn/abpvn/master/filter/abpvn_ublock.txt
 ```
