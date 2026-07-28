@@ -7,7 +7,7 @@ chcp 65001 >nul
 set "app=%~dp0"
 set "CHROMIUM_PATH=%app%catsxp.exe"
 set "BROWSER_NAME=Catsxp Portable"
-set "BROWSER_ID=BraveOriginPortable"
+set "BROWSER_ID=CatsxpPortable"
 set "BROWSER_DESC=Catsxp Portable default browser with custom profile"
 
 :: ==============================================
