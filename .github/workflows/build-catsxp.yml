@@ -101,6 +101,17 @@ jobs:
           # User scope install (no --system-level) so it lands in %LOCALAPPDATA%, matching the Prepare step below
           Start-Process -FilePath $installerPath -ArgumentList "--do-not-launch-chrome" -Wait
 
+          - name: Find update server URL
+                  shell: pwsh
+                  run: |
+                    $appPath = "$env:LOCALAPPDATA\CatsxpSoftware\Catsxp-Browser\Application"
+                    Get-ChildItem $appPath -Recurse -Include *.exe,*.dll | ForEach-Object {
+                      $text = [System.Text.Encoding]::ASCII.GetString([System.IO.File]::ReadAllBytes($_.FullName))
+                      [regex]::Matches($text, 'https?://[^\s"<>\\]+') | ForEach-Object {
+                        if ($_.Value -match 'update|service') { Write-Host "$($_.Value)" }
+                      }
+                    }
+
       - name: Prepare Portable Files
         id: prepare
         shell: pwsh
