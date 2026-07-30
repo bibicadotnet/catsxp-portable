@@ -15,70 +15,32 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Resolve Latest Manifest from winget-pkgs
+      - name: Resolve Latest Version and URL from Catsxp Update API
         id: manifest
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
-
-          # 1. List version folders for the package
-          $listUrl = "https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests/c/Catsxp/Catsxp"
-          $dirs = Invoke-RestMethod -Uri $listUrl -Headers @{ "User-Agent" = "gh-actions" }
-          $latest = $dirs | Where-Object { $_.type -eq "dir" } | Sort-Object { [version]$_.name } -Descending | Select-Object -First 1
-
-          if (-not $latest) {
-              Write-Error "Could not find any version folder in winget-pkgs"
+          $body = '<?xml version="1.0" encoding="UTF-8"?><request><app appid="{485AC8F6-31A4-3283-B765-92E31A816C51}" version="132.4.12.1" ap="x86-release" /><app appid="{485AC8F6-31A4-3283-B765-92E31A816C51}" version="132.4.12.1" ap="x64-release" /></request>'
+          $resp = Invoke-RestMethod -Uri 'https://www.catsxp.com/api/service/Update?cup2key=:' -Method Post -Body $body -ContentType "application/xml"
+          [xml]$xml = $resp
+          # Second app element (index 1) corresponds to x64-release
+          $x64App = $xml.response.app[1]
+          if ($x64App.updatecheck.status -ne "ok") {
+              Write-Error "Update check failed for x64"
               exit 1
           }
-
-          $version = $latest.name
-          Write-Host "Latest manifest version: $version"
-
-          # 2. Fetch the installer yaml for that version
-          $installerYamlUrl = "https://raw.githubusercontent.com/microsoft/winget-pkgs/master/manifests/c/Catsxp/Catsxp/$version/Catsxp.Catsxp.installer.yaml"
-          $yamlContent = Invoke-RestMethod -Uri $installerYamlUrl -Headers @{ "User-Agent" = "gh-actions" }
-
-          # 3. Extract the x64/user installer block (URL + sha256)
-          #    Match the "- Architecture: x64" ... "Scope: user" block specifically
-          $lines = $yamlContent -split "`n"
-          $url = $null
-          $sha256 = $null
-          $inX64Machine = $false
-          $currentArch = $null
-          $currentScope = $null
-          $pendingUrl = $null
-          $pendingSha = $null
-
-          foreach ($line in $lines) {
-              if ($line -match '^\s*-\s*Architecture:\s*(\S+)') {
-                  $currentArch = $matches[1]
-                  $currentScope = $null
-                  $pendingUrl = $null
-                  $pendingSha = $null
-              }
-              elseif ($line -match '^\s*Scope:\s*(\S+)') {
-                  $currentScope = $matches[1]
-              }
-              elseif ($line -match '^\s*InstallerUrl:\s*(\S+)') {
-                  $pendingUrl = $matches[1]
-              }
-              elseif ($line -match '^\s*InstallerSha256:\s*(\S+)') {
-                  $pendingSha = $matches[1]
-                  if ($currentArch -eq "x64" -and $currentScope -eq "user") {
-                      $url = $pendingUrl
-                      $sha256 = $pendingSha
-                  }
-              }
-          }
-
-          if (-not $url -or -not $sha256) {
-              Write-Error "Could not extract x64/user InstallerUrl or InstallerSha256 from manifest"
+          $version = $x64App.updatecheck.manifest.version
+          # Use the first codebase URL for x64 returned directly by the server
+          $url = $x64App.updatecheck.urls.url[0].codebase
+          # SHA256 hash returned directly by the server for the package
+          $sha256 = $x64App.updatecheck.manifest.packages.package.hash_sha256
+          if (-not $version -or -not $url -or -not $sha256) {
+              Write-Error "Could not extract version, URL, or SHA256 from XML response"
               exit 1
           }
-
+          Write-Host "Latest version: $version"
           Write-Host "Installer URL: $url"
           Write-Host "Installer SHA256: $sha256"
-
           echo "VERSION=$version" >> $env:GITHUB_ENV
           echo "INSTALLER_URL=$url" >> $env:GITHUB_ENV
           echo "INSTALLER_SHA256=$sha256" >> $env:GITHUB_ENV
@@ -106,12 +68,16 @@ jobs:
           $installerPath = "$env:RUNNER_TEMP\catsxp_installer_x64.exe"
           Invoke-WebRequest -Uri $env:INSTALLER_URL -OutFile $installerPath
 
-          $actualHash = (Get-FileHash -Path $installerPath -Algorithm SHA256).Hash
-          if ($actualHash -ne $env:INSTALLER_SHA256) {
-              Write-Error "SHA256 mismatch! Expected $env:INSTALLER_SHA256 but got $actualHash"
-              exit 1
+          if ($env:INSTALLER_SHA256) {
+              $actualHash = (Get-FileHash -Path $installerPath -Algorithm SHA256).Hash
+              if ($actualHash.ToLower() -ne $env:INSTALLER_SHA256.ToLower()) {
+                  Write-Error "SHA256 mismatch! Expected $env:INSTALLER_SHA256 but got $actualHash"
+                  exit 1
+              }
+              Write-Host "SHA256 verified OK."
+          } else {
+              Write-Host "No hash provided by API, skipping verification."
           }
-          Write-Host "SHA256 verified OK."
 
           # User scope install (no --system-level) so it lands in %LOCALAPPDATA%, matching the Prepare step below
           Start-Process -FilePath $installerPath -ArgumentList "--do-not-launch-chrome" -Wait
