@@ -2,6 +2,13 @@
 
 [Catsxp](https://www.catsxp.com/?utm_source=chatgpt.com) mặc định đã hỗ trợ chế độ Portable. Tuy nhiên, cơ chế cập nhật của phiên bản này chưa thuận tiện, nên mình viết thêm `update.bat` để việc cập nhật trở nên đơn giản hơn.
 
+> [!IMPORTANT]
+> URL download được lấy trực tiếp từ kết quả Omaha API trả về `https://www.catsxp.com/api/service/Update`, tương đương với hành động người dùng bấm kiểm tra cập nhật thủ công trong `catsxp://settings/help`.
+> 
+> Hệ thống sẽ thực hiện bước kiểm tra SHA256 đối chiếu với phần phản hồi manifest của API nhằm đảm bảo file `.exe` tải về đạt tính toàn vẹn tuyệt đối, tránh file lỗi hoặc bị can thiệp giữa đường
+>
+> Các bản release Catsxp Portable tại dự án này được đóng gói lại từ phiên bản cài đặt tiêu chuẩn chính thức của Catsxp.
+
 ## Cài đặt
 
 * Tải gói cài đặt tại: [https://github.com/bibicadotnet/catsxp-portable/releases/download/setup/Catsxp_Portable.zip](https://github.com/bibicadotnet/catsxp-portable/releases/download/setup/Catsxp_Portable.zip)
