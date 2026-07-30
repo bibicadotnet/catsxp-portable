@@ -30,19 +30,20 @@ jobs:
               exit 1
           }
           $version = $x64App.updatecheck.manifest.version
-          # Use the first codebase URL for x64 returned directly by the server
-          $url = $x64App.updatecheck.urls.url[0].codebase
+          # Collect all mirror codebase URLs returned by the server
+          $urls = $x64App.updatecheck.urls.url | ForEach-Object { $_.codebase }
           # SHA256 hash returned directly by the server for the package
           $sha256 = $x64App.updatecheck.manifest.packages.package.hash_sha256
-          if (-not $version -or -not $url -or -not $sha256) {
-              Write-Error "Could not extract version, URL, or SHA256 from XML response"
+          if (-not $version -or -not $urls -or -not $sha256) {
+              Write-Error "Could not extract version, URLs, or SHA256 from XML response"
               exit 1
           }
           Write-Host "Latest version: $version"
-          Write-Host "Installer URL: $url"
+          Write-Host "Installer URLs:"
+          $urls | ForEach-Object { Write-Host "  $_" }
           Write-Host "Installer SHA256: $sha256"
           echo "VERSION=$version" >> $env:GITHUB_ENV
-          echo "INSTALLER_URL=$url" >> $env:GITHUB_ENV
+          echo "INSTALLER_URLS=$($urls -join ',')" >> $env:GITHUB_ENV
           echo "INSTALLER_SHA256=$sha256" >> $env:GITHUB_ENV
 
       - name: Check if Release Exists
@@ -66,7 +67,25 @@ jobs:
           $ErrorActionPreference = "Stop"
 
           $installerPath = "$env:RUNNER_TEMP\catsxp_installer_x64.exe"
-          Invoke-WebRequest -Uri $env:INSTALLER_URL -OutFile $installerPath
+          $urls = $env:INSTALLER_URLS -split ','
+          $downloaded = $false
+
+          foreach ($u in $urls) {
+              try {
+                  Write-Host "Trying $u ..."
+                  Invoke-WebRequest -Uri $u -OutFile $installerPath
+                  $downloaded = $true
+                  Write-Host "Downloaded from $u"
+                  break
+              } catch {
+                  Write-Host "Failed: $u ($($_.Exception.Message))"
+              }
+          }
+
+          if (-not $downloaded) {
+              Write-Error "Could not download installer from any mirror URL"
+              exit 1
+          }
 
           if ($env:INSTALLER_SHA256) {
               $actualHash = (Get-FileHash -Path $installerPath -Algorithm SHA256).Hash
