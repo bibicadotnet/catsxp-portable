@@ -83,7 +83,22 @@ jobs:
           echo "INSTALLER_URL=$url" >> $env:GITHUB_ENV
           echo "INSTALLER_SHA256=$sha256" >> $env:GITHUB_ENV
 
+      - name: Check if Release Exists
+        id: check_release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "v${{ env.VERSION }}" > /dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Release v${{ env.VERSION }} already exists, skipping build."
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Release v${{ env.VERSION }} does not exist, proceeding with build."
+          fi
+
       - name: Download and Install Catsxp (x64)
+        if: steps.check_release.outputs.exists == 'false'
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
@@ -103,6 +118,7 @@ jobs:
 
       - name: Prepare Portable Files
         id: prepare
+        if: steps.check_release.outputs.exists == 'false'
         shell: pwsh
         run: |
           $appData = $env:LOCALAPPDATA
@@ -120,8 +136,6 @@ jobs:
           
           $version = $versionDir.Name
           
-          echo "VERSION=$version" >> $env:GITHUB_ENV
-          
           $staging = "$pwd\Catsxp_Portable"
           New-Item -ItemType Directory -Path $staging | Out-Null
           
@@ -138,18 +152,6 @@ jobs:
           Compress-Archive -Path "$staging\*" -DestinationPath $zipFile
           
           echo "ZIP_FILE=$zipFile" >> $env:GITHUB_ENV
-
-      - name: Check if Release Exists
-        id: check_release
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if gh release view "v${{ env.VERSION }}" > /dev/null 2>&1; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
 
       - name: Create GitHub Release
         if: steps.check_release.outputs.exists == 'false'
