@@ -15,6 +15,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Update winget sources
+        run: |
+          winget source reset --force
+          winget source update
+
       - name: Install Catsxp via Winget
         run: winget install -e --id Catsxp.Catsxp --architecture x64 --accept-package-agreements --accept-source-agreements
         
