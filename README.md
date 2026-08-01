@@ -1,7 +1,7 @@
 # Catsxp Portable
 
 <p align="center">
-  <img src="https://img.bibica.net/UEgBAnVj.png" alt="Image">
+  <img src="https://img.bibica.net/DrNuwrhh.png" alt="Image">
 </p>
 
 [Catsxp](https://www.catsxp.com/?utm_source=chatgpt.com) mặc định đã hỗ trợ chế độ Portable. Tuy nhiên, cơ chế cập nhật của phiên bản này chưa thuận tiện, nên mình viết thêm `update.bat` để việc cập nhật trở nên đơn giản hơn
