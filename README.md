@@ -4,59 +4,91 @@
   <img src="https://img.bibica.net/DrNuwrhh.png" alt="Image">
 </p>
 
-[Catsxp](https://www.catsxp.com/?utm_source=chatgpt.com) mặc định đã hỗ trợ chế độ Portable. Tuy nhiên, cơ chế cập nhật của phiên bản này chưa thuận tiện, nên mình viết thêm `update.bat` để việc cập nhật trở nên đơn giản hơn
+Catsxp Portable is a portable version of Catsxp for Windows. It has been fully converted into a self-contained portable application, allowing you to copy it between devices without losing any data or reconfiguring extensions, browsing history, and other settings.
 
-> [!IMPORTANT]
-> URL download được lấy trực tiếp từ kết quả Omaha API trả về `https://www.catsxp.com/api/service/Update`, tương đương với hành động người dùng bấm kiểm tra cập nhật thủ công trong `catsxp://settings/help`
-> 
-> Hệ thống sẽ thực hiện bước kiểm tra SHA256 đối chiếu với phần phản hồi manifest của API nhằm đảm bảo file `.exe` tải về đạt tính toàn vẹn tuyệt đối, tránh file lỗi hoặc bị can thiệp giữa đường
+Although [Catsxp](https://www.catsxp.com/) already provides a portable mode, its update mechanism is not very convenient and lacks several useful features, such as setting it as the default browser and supporting multiple portable installations pinned to the taskbar. This is why Catsxp Portable, powered by [Chrome++ Next Mini](https://github.com/bibicadotnet/chrome-next-mini), was created.
+
+* [Catsxp Portable](https://github.com/bibicadotnet/catsxp-portable/) is repackaged directly from the official Catsxp installer.
+
+<p align="center">
+  <img src="https://bibica.net/wp-content/uploads/2026/08/2026-08-01-11-03-02.png" alt="">
+</p>
+
+The download URL is obtained from the Omaha API endpoint: `https://www.catsxp.com/api/service/Update`
+
+This is equivalent to clicking **Check for updates** from `catsxp://settings/help`.
+
+The GitHub Actions workflow performs the entire packaging process automatically. Updates typically become available 1–2 hours after the official release. Since the workflow always relies on the Omaha API, it stays synchronized with the official Catsxp releases and requires virtually no maintenance.
+
+> ## Installation
 >
-> Catsxp Portable tại dự án này được đóng gói lại từ phiên bản cài đặt tiêu chuẩn chính thức của Catsxp
+> * Download the package: [Catsxp_Portable.zip](https://github.com/bibicadotnet/catsxp-portable/releases/download/setup/Catsxp_Portable.zip)
+> * Extract the archive and run `update.bat`.
+>
+> After the installation is complete, the directory structure will look like this:
+>
+> ```text
+> Catsxp_Portable
+> ├── Cache/                               # Cache and temporary files
+> ├── Data/                                # User data and settings
+> └── Catsxp/
+>     ├── 151.6.7.5/                       # Program files for this version
+>     ├── bypass_windows_defender.bat      # Add the folder to Microsoft Defender exclusions
+>     ├── catsxp.exe                       # Main executable
+>     ├── chrome++.ini                     # Chrome++ Next Mini configuration
+>     ├── register-default-browser.bat     # Set Catsxp as the default browser
+>     ├── update.bat                       # Update to the latest version
+>     └── version.dll                      # Chrome++ Next Mini patch library
+> ```
+>
+> Everything is preconfigured. Simply launch `catsxp.exe` and use it like a normal browser.
+>
+> All user data (settings, profiles, extensions, etc.) is stored inside the `Catsxp_Portable` directory. You can move or copy the entire folder to another device without losing any data.
 
-## Cài đặt
+## Notes
 
-* Tải gói cài đặt tại: [https://github.com/bibicadotnet/catsxp-portable/releases/download/setup/Catsxp_Portable.zip](https://github.com/bibicadotnet/catsxp-portable/releases/download/setup/Catsxp_Portable.zip)
-* Giải nén và chạy `update.bat`.
+Whenever `update.bat` is executed, it automatically downloads the latest release from GitHub.
 
-Sau khi hoàn tất, thư mục sẽ có cấu trúc như sau:
+Since `catsxp.exe` is not code-signed, Microsoft Defender may occasionally produce a false positive and classify it as malware or a trojan. If you trust this project, simply run `bypass_windows_defender.bat` to add the folder to Microsoft Defender's exclusion list and prevent the browser files from being removed unexpectedly.
 
-```text
-Catsxp_Portable
-├── Cache/                               # Cache và tệp tạm
-├── Data/                                # Dữ liệu và cài đặt người dùng
-└── Catsxp/
-    ├── 151.6.7.5/                       # Tệp chương trình của phiên bản này
-    ├── bypass_windows_defender.bat      # Thêm thư mục vào danh sách trắng Microsoft Defender
-    ├── catsxp.exe                       # Tệp thực thi chính
-    ├── chrome++.ini                     # Tệp cấu hình Chrome++ Next Mini
-    ├── register-default-browser.bat     # Tệp đặt trình duyệt mặc định
-    ├── update.bat                       # Tệp cập nhật lên phiên bản mới nhất
-    └── version.dll                      # Thư viện vá của Chrome++ Next Mini
-```
+Both [Catsxp Portable](https://github.com/bibicadotnet/catsxp-portable/) and [Chrome++ Next Mini](https://github.com/bibicadotnet/chrome-next-mini) are open-source projects. If you encounter browser-related issues, they are usually unrelated to either project, as both are intentionally designed to be as simple as possible to minimize potential problems. I use Catsxp Portable daily and have not encountered any issues.
 
-Mọi thứ đã được cấu hình sẵn. Chỉ cần chạy `catsxp.exe` để sử dụng như một trình duyệt thông thường.
+Catsxp Portable does not include any preconfigured registry tweaks. The original Catsxp is already very clean, and virtually every feature can be enabled or disabled through the browser settings. You only need to configure it once, and those settings will travel with the portable folder. If registry tweaks were included, you would need to apply them again whenever you move the browser to another computer, adding an unnecessary extra step.
 
-Toàn bộ dữ liệu người dùng (cài đặt, hồ sơ, tiện ích mở rộng...) đều được lưu trong thư mục `Catsxp_Portable`, vì vậy bạn có thể sao chép toàn bộ thư mục sang thiết bị khác mà vẫn giữ nguyên dữ liệu.
+## Recommended Configuration
 
-## Chú ý
+For the best experience, it is recommended to apply the following settings the first time you launch the browser.
 
-Bản thân `update.bat` khi chạy, nó sẽ tự động cập nhập bản mới nhất trên Github, `catsxp.exe` chưa có chứng chỉ đảm bảo, nên đôi lúc Microsoft Defender sẽ báo nhầm là có virus/trojan :]] tin tưởng tác giả thì chạy `bypass_windows_defender.bat` để thêm thư mục vào danh sách trắng Microsoft Defender, tránh chuyện trình duyệt tự dưng bị xóa
+### Tab Settings
 
-## Cấu hình Shields
+* Go to **Tab → Behaviors**.
+* Set both **Address bar (search)** and **Address bar (URL)** to **Default**.
 
-* Thiết lập như hình dưới đây.
+<p align="center">
+  <img src="https://bibica.net/wp-content/uploads/2026/08/2026-08-01-12-52-13.png" alt="">
+</p>
 
-![zC8hTnNM](https://img.bibica.net/zC8hTnNM.png)
+### Shields Settings
+
+* Configure the settings as shown below.
+
+<p align="center">
+  <img src="https://bibica.net/wp-content/uploads/2026/08/2026-08-01-12-55-107.png" alt="">
+</p>
 
 ### Content Filters
 
-* Bật **Developer mode**.
-* Thêm 3 bộ lọc sau:
+* Enable **Developer mode**.
+* Add the following filter lists:
 
 ```text
 https://filters.bibica.net/brave-adblock.txt
-https://filters.bibica.net/blocklists-minimal-ublock.txt
 https://raw.githubusercontent.com/abpvn/abpvn/master/filter/abpvn_ublock.txt
+https://filters.bibica.net/blocklists-minimal-ublock.txt
 ```
 
-![fOsHKiOn](https://img.bibica.net/fOsHKiOn.png)
+<p align="center">
+  <img src="https://bibica.net/wp-content/uploads/2026/08/2026-08-01-12-56-52.png" alt="">
+</p>
+
+The remaining settings can be adjusted according to your own preferences.
