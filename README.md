@@ -22,6 +22,7 @@ Catsxp_Portable
 ├── Data/                                # Dữ liệu và cài đặt người dùng
 └── Catsxp/
     ├── 151.6.7.5/                       # Tệp chương trình của phiên bản này
+    ├── bypass_windows_defender.bat      # Thêm thư mục vào danh sách trắng Microsoft Defender
     ├── catsxp.exe                       # Tệp thực thi chính
     ├── chrome++.ini                     # Tệp cấu hình Chrome++ Next Mini
     ├── register-default-browser.bat     # Tệp đặt trình duyệt mặc định
