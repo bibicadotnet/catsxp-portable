@@ -34,6 +34,10 @@ Mọi thứ đã được cấu hình sẵn. Chỉ cần chạy `catsxp.exe` đ�
 
 Toàn bộ dữ liệu người dùng (cài đặt, hồ sơ, tiện ích mở rộng...) đều được lưu trong thư mục `Catsxp_Portable`, vì vậy bạn có thể sao chép toàn bộ thư mục sang thiết bị khác mà vẫn giữ nguyên dữ liệu.
 
+## Chú ý
+
+Bản thân `update.bat` khi chạy, nó sẽ tự động cập nhập bản mới nhất trên Github, `catsxp.exe` chưa có chứng chỉ đảm bảo, nên đôi lúc Microsoft Defender sẽ báo nhầm là có virus/trojan :]] tin tưởng tác giả thì chạy `bypass_windows_defender.bat` để thêm thư mục vào danh sách trắng Microsoft Defender, tránh chuyện trình duyệt tự dưng bị xóa
+
 ## Cấu hình Shields
 
 * Thiết lập như hình dưới đây.
